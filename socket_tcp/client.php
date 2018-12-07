@@ -8,15 +8,16 @@
  */
 
 $ip = '192.168.1.10';
+// $ip = '192.168.1.73';
 $port = 23333;
 $sk = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-!$sk && echoSocketError('socket_create error');
+!$sk && outInfo('socket_create error');
 
-!socket_connect($sk, $ip, $port) && echoSocketError('connect fail');
+!socket_connect($sk, $ip, $port) && outInfo('connect fail');
 $msg = 'hello, I am A';
 
 if (socket_write($sk, $msg, strlen($msg)) === false) {
-    echoSocketError('socket_write fail');
+    outInfo('socket_write fail');
 }
 
 while ($res = socket_read($sk, 1024)) {
@@ -25,7 +26,13 @@ while ($res = socket_read($sk, 1024)) {
 
 socket_close($sk);//工作完毕，关闭套接流
 
-function echoSocketError($errMsg)
+function outInfo($errMsg)
 {
-    echo "$errMsg, msg: " . socket_strerror(socket_last_error()) . PHP_EOL;die;
+    if ($level === 'INFO') {
+        $outstr = $errMsg . PHP_EOL;
+    } elseif ($level === 'ERROR') {
+        $outstr = "$errMsg, msg: " . socket_strerror(socket_last_error()) . PHP_EOL;
+    }
+    echo $outstr;
+    $level === 'ERROR' && die;
 }
